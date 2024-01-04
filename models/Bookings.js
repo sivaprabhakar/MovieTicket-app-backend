@@ -10,10 +10,10 @@ const bookingSchema = new mongoose.Schema({
       type: Date,
       required: true,
     },
-    seatNumber: {
+    seatNumbers: [{
       type: Number,
       required: true,
-    },
+    }],
     user: {
       type: mongoose.Types.ObjectId,
       ref: "users",

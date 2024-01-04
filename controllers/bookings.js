@@ -1,16 +1,16 @@
 import mongoose from "../models/index.js";
 import Booking from "../models/Bookings.js";
 import Movie from "../models/Movie.js";
-import User from "../models/users.js";
+import userModel from "../models/users.js";
 
 export const newBooking = async (req, res, next) => {
-  const { movie, date, seatNumber, user } = req.body;
+  const { movie, date, seatNumbers, user } = req.body;
 
   let existingMovie;
   let existingUser;
   try {
     existingMovie = await Movie.findById(movie);
-    existingUser = await User.findById(user);
+    existingUser = await userModel.findById(user);
   } catch (err) {
     return console.log(err);
   }
@@ -26,7 +26,7 @@ export const newBooking = async (req, res, next) => {
     booking = new Booking({
       movie,
       date: new Date(`${date}`),
-      seatNumber,
+      seatNumbers,
       user,
     });
     const session = await mongoose.startSession();
@@ -47,6 +47,7 @@ export const newBooking = async (req, res, next) => {
 
   return res.status(201).json({ booking });
 };
+
 
 
 export const getBookingById = async (req, res) => {

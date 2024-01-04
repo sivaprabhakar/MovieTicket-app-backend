@@ -1,0 +1,22 @@
+// export const newBooking = async (req, res) => {
+//   try {
+    // Extract user ID from the request or token (assuming token is sent in headers)
+    // const authHeader = req.headers.authorization;
+    // if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    //   return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+    // }
+    // const token = authHeader.split(' ')[1];
+    // const decodedToken = jwt.verify(token, process.env.JWT_SECRET); // Replace 'your_secret_key' with your actual secret
+    // const userId = decodedToken.id;
+
+    // Create a new booking with the received user ID and other details from req.body
+//     const { movieId, seats } = req.body;
+//     const booking = new Booking({ userId, movieId, seats });
+//     const savedBooking = await booking.save();
+
+//     res.status(201).json(savedBooking);
+//   } catch (error) {
+//     console.error('Error while creating a booking:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// };
