@@ -1,5 +1,5 @@
 import express from 'express';
-import { verifyToken, deleteUserById, getAllUsers, getBookingsOfUser, loginUser, signUp, updateUser, getUserById } from '../controllers/users.js';
+import { verifyToken, deleteUserById, getAllUsers, getBookingsOfUser, loginUser, signUp, updateUser, getUserProfile } from '../controllers/users.js';
 
 const userRouter = express.Router();
 
@@ -9,5 +9,5 @@ userRouter.put('/:id', verifyToken, updateUser);
 userRouter.delete('/:id', deleteUserById);
 userRouter.post('/login', loginUser);
 userRouter.get('/booking/:id', verifyToken, getBookingsOfUser);
-userRouter.get('/:id',getUserById)
+userRouter.get('/:id',getUserProfile)
 export default userRouter;

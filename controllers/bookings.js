@@ -23,6 +23,7 @@ export const newBooking = async (req, res, next) => {
   let booking;
 
   try {
+    console.log("Creating new booking:", { movie, date, seatNumbers, user });
     booking = new Booking({
       movie,
       date: new Date(`${date}`),
@@ -50,49 +51,48 @@ export const newBooking = async (req, res, next) => {
 
 
 
-export const getBookingById = async (req, res) => {
+export const getBookingById = async (req, res, next) => {
   const id = req.params.id;
-
+  let booking;
   try {
-    const booking = await Booking.findById(id);
-    if (!booking) {
-      return res.status(404).json({ message: "Booking Not Found" });
-    }
-    return res.status(200).json({ booking });
+    booking = await Booking.findById(id);
   } catch (err) {
-    console.error(err);
+    return console.log(err);
+  }
+  if (!booking) {
     return res.status(500).json({ message: "Unexpected Error" });
   }
+  return res.status(200).json({ booking });
 };
 
-export const deleteBooking = async (req, res) => {
+export const deleteBooking = async (req, res, next) => {
   const id = req.params.id;
-  
-  let session; // Define session variable outside the try block
-  
+  let booking;
+
   try {
-    const booking = await Booking.findOneAndDelete({ _id: id }).populate("user movie");
+    booking = await Booking.findByIdAndDelete(id).populate("user movie");
+
     if (!booking) {
-      return res.status(404).json({ message: "Booking Not Found" });
+      return res.status(404).json({ message: "Booking not found" });
     }
 
-    session = await mongoose.startSession();
+    const session = await mongoose.startSession();
     session.startTransaction();
 
-    await booking.user.bookings.pull(booking);
-    await booking.movie.bookings.pull(booking);
+    if (booking.user) {
+      await booking.user.bookings.pull(booking);
+      await booking.user.save({ session });
+    }
 
-    await booking.movie.save({ session });
-    await booking.user.save({ session });
+    if (booking.movie) {
+      await booking.movie.bookings.pull(booking);
+      await booking.movie.save({ session });
+    }
 
-    await session.commitTransaction();
+    session.commitTransaction();
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Unable to Delete" });
-  } finally {
-    if (session) { // Check if session is defined before ending it
-      session.endSession();
-    }
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 
   return res.status(200).json({ message: "Successfully Deleted" });

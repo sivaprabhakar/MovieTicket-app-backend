@@ -128,39 +128,22 @@ export const deleteUserById = async (req, res) => {
     }
 };
 
-export const getBookingsOfUser = async (req, res) => {
-    const id = req.params.id;
-    let bookings;
-    try {
-      bookings = await Booking.find({ user: id }).populate("movie");
-      
-      if (!bookings || bookings.length === 0) {
-        return res.status(404).json({ message: "No bookings found for this user" });
-      }
-      
-      return res.status(200).json({ bookings });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Failed to fetch bookings" });
-    }
-  };
-  
-  export const getUserById = async (req, res) => {
-    const id = req.params.id;
-  
-    try {
-      const user = await userModel.findById(id);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      return res.status(200).json({ user });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Failed to fetch user" });
-    }
-}
+export const getBookingsOfUser = async (req, res, next) => {
+  const id = req.params.id;
+  let bookings;
+  try {
+    bookings = await Booking.find({ user: id })
+      .populate("movie")
+      .populate("user");
+  } catch (err) {
+    return console.log(err);
+  }
+  if (!bookings) {
+    return res.status(500).json({ message: "Unable to get Bookings" });
+  }
+  return res.status(200).json({ bookings });
+};
+
 
 export const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -178,3 +161,20 @@ export const verifyToken = (req, res, next) => {
   }
 };
 
+export const getUserProfile = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const bookings = await Booking.find({ user: userId }).populate("movie");
+
+    return res.status(200).json({ user, bookings });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to fetch user profile" });
+  }
+};
